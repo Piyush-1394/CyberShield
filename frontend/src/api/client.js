@@ -1,8 +1,10 @@
 import axios from 'axios'
 
-// Use ?? (not ||) so an intentionally empty string ("" = same-origin, used
-// when the backend serves the built frontend itself or via Vite proxy) isn't overridden.
+// Use VITE_API_BASE_URL if configured; if on Render, automatically route to the backend web service.
 let rawBaseURL = (import.meta.env.VITE_API_BASE_URL ?? '').trim()
+if (!rawBaseURL && typeof window !== 'undefined' && window.location.hostname.endsWith('.onrender.com')) {
+  rawBaseURL = 'https://cybershield-api-ue9w.onrender.com'
+}
 if (rawBaseURL && !rawBaseURL.startsWith('http://') && !rawBaseURL.startsWith('https://')) {
   rawBaseURL = `https://${rawBaseURL}`
 }

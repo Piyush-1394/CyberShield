@@ -56,7 +56,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        fromService:
-          type: web
-          name: cybershield-api
-          property: host
+        value: https://cybershield-api-ue9w.onrender.com

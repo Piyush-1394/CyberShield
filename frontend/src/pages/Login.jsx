@@ -17,7 +17,8 @@ export default function Login() {
       await login(email.trim(), password)
       nav('/app/overview')
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed')
+      const msg = err.response?.data?.message || (err.message === 'Network Error' ? 'Cannot connect to backend server. Please check CORS/network.' : err.message) || 'Login failed'
+      setError(msg)
     } finally { setBusy(false) }
   }
 
