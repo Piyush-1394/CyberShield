@@ -47,7 +47,6 @@ services:
   - type: web
     name: cybershield-web
     runtime: static
-    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
