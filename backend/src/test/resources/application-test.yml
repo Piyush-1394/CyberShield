@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:cybershieldtest;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  mail:
+    host: localhost
+    port: 3025
+
+app:
+  jwt:
+    secret: test-secret-key-must-be-at-least-32-chars
+    access-token-minutes: 15
+    refresh-token-days: 7
+  seed: true
+  reports-dir: ${java.io.tmpdir}/cybershield-test-reports

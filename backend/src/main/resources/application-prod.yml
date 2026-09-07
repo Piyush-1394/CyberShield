@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:${JDBC_DATABASE_URL:jdbc:postgresql://localhost:5432/cybershield}}
+    username: ${SPRING_DATASOURCE_USERNAME:${JDBC_DATABASE_USERNAME:cybershield}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${JDBC_DATABASE_PASSWORD:cybershield}}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+
+app:
+  seed: ${APP_SEED:true}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:https://*.onrender.com,http://localhost:5173,http://localhost:3000}
