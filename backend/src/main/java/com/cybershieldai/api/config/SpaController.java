@@ -28,20 +28,21 @@ public class SpaController {
         if (hasEmbeddedFrontend) {
             return "forward:/index.html";
         }
-        return "forward:/";
+        return org.springframework.http.ResponseEntity.status(404).body(Map.of(
+                "error", "Frontend is hosted separately. Please access the web application via its frontend URL."
+        ));
     }
 
     @GetMapping("/")
-    @ResponseBody
     public Object root() {
         if (hasEmbeddedFrontend) {
             return "forward:/index.html";
         }
-        return Map.of(
+        return org.springframework.http.ResponseEntity.ok(Map.of(
                 "status", "UP",
                 "service", "CyberShield AI API",
                 "version", "1.0.0",
                 "docs", "/swagger-ui.html"
-        );
+        ));
     }
 }
