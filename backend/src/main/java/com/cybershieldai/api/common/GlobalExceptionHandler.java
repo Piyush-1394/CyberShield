@@ -52,6 +52,12 @@ public class GlobalExceptionHandler {
         return body(HttpStatus.BAD_REQUEST, "Malformed request body", req);
     }
 
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ErrorBody> handleNotFound(
+            org.springframework.web.servlet.resource.NoResourceFoundException ex, HttpServletRequest req) {
+        return body(HttpStatus.NOT_FOUND, "Resource not found", req);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorBody> handleOther(Exception ex, HttpServletRequest req) {
         org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class).error("Unhandled exception", ex);
