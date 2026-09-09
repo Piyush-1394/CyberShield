@@ -33,6 +33,9 @@ public class OrganizationService {
         OrganizationEntity org = orgs.findById(orgGuard.requireOrg()).orElseThrow();
         org.setName(req.name());
         org.setLogoUrl(req.logoUrl());
+        if (req.budgetAvailable() != null && req.budgetAvailable().compareTo(BigDecimal.ZERO) >= 0) {
+            org.setBudgetAvailable(req.budgetAvailable());
+        }
         return toDto(org);
     }
 
@@ -41,7 +44,7 @@ public class OrganizationService {
                 org.getBudgetAllocated(), org.getCreatedAt());
     }
 
-    public record OrgUpdateRequest(@NotBlank String name, String logoUrl) {}
+    public record OrgUpdateRequest(@NotBlank String name, String logoUrl, BigDecimal budgetAvailable) {}
 
     public record OrgResponse(Long id, String name, String logoUrl, BigDecimal budgetAvailable,
                               BigDecimal budgetAllocated, Instant createdAt) {}

@@ -34,10 +34,12 @@ public class InvestmentService {
         this.risk = risk;
     }
 
-    public RecommendationsResponse recommendations() {
+    public RecommendationsResponse recommendations(BigDecimal overrideBudget) {
         Long orgId = orgGuard.requireOrg();
         OrganizationEntity org = orgs.findById(orgId).orElseThrow();
-        BigDecimal budget = org.getBudgetAvailable();
+        BigDecimal budget = (overrideBudget != null && overrideBudget.compareTo(BigDecimal.ZERO) > 0)
+                ? overrideBudget
+                : org.getBudgetAvailable();
         List<RemediationActionEntity> catalog = actions.findByOrganizationIdAndActiveTrue(orgId).stream()
                 .filter(a -> !applied.existsByOrganizationIdAndActionId(orgId, a.getId()))
                 .sorted(Comparator.comparing((RemediationActionEntity a) ->
@@ -58,10 +60,14 @@ public class InvestmentService {
         return new RecommendationsResponse(budget, remaining, reduction.min(BigDecimal.valueOf(70)), selected);
     }
 
-    public ProjectionResponse projection() {
+    public RecommendationsResponse recommendations() {
+        return recommendations(null);
+    }
+
+    public ProjectionResponse projection(BigDecimal overrideBudget) {
         Long orgId = orgGuard.requireOrg();
         var totals = risk.totals(orgId);
-        var rec = recommendations();
+        var rec = recommendations(overrideBudget);
         BigDecimal projected = totals.overall().multiply(
                 BigDecimal.ONE.subtract(rec.expectedReductionPercent().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP)));
         List<Point> current = new ArrayList<>();
@@ -73,6 +79,10 @@ public class InvestmentService {
             projectedSeries.add(new Point(i, p.setScale(2, RoundingMode.HALF_UP)));
         }
         return new ProjectionResponse(totals.overall(), projected.setScale(2, RoundingMode.HALF_UP), current, projectedSeries);
+    }
+
+    public ProjectionResponse projection() {
+        return projection(null);
     }
 
     @Transactional

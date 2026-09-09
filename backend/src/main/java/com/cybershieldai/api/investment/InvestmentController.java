@@ -12,13 +12,13 @@ public class InvestmentController {
     }
 
     @GetMapping("/recommendations")
-    public InvestmentService.RecommendationsResponse recommendations() {
-        return service.recommendations();
+    public InvestmentService.RecommendationsResponse recommendations(@RequestParam(required = false) java.math.BigDecimal budget) {
+        return service.recommendations(budget);
     }
 
     @GetMapping("/projection")
-    public InvestmentService.ProjectionResponse projection() {
-        return service.projection();
+    public InvestmentService.ProjectionResponse projection(@RequestParam(required = false) java.math.BigDecimal budget) {
+        return service.projection(budget);
     }
 
     @PostMapping("/apply")

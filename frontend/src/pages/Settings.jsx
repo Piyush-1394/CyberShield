@@ -12,14 +12,19 @@ export default function Settings() {
   const prefs = useNotifications()
   const { user, isAdmin, setUser } = useAuth()
   const qc = useQueryClient()
-  const [orgForm, setOrgForm] = useState({ name: '', logoUrl: '' })
+  const [orgForm, setOrgForm] = useState({ name: '', logoUrl: '', budgetAvailable: '' })
   const [profile, setProfile] = useState({ fullName: '', email: '' })
   const [pw, setPw] = useState({ currentPassword: '', newPassword: '' })
   const [invite, setInvite] = useState({ email: '', role: 'VIEWER' })
   const [inviteToken, setInviteToken] = useState('')
+  const [orgSaved, setOrgSaved] = useState(false)
 
   useEffect(() => {
-    if (org.data) setOrgForm({ name: org.data.name, logoUrl: org.data.logoUrl || '' })
+    if (org.data) setOrgForm({
+      name: org.data.name,
+      logoUrl: org.data.logoUrl || '',
+      budgetAvailable: org.data.budgetAvailable ?? ''
+    })
   }, [org.data])
   useEffect(() => {
     if (user) setProfile({ fullName: user.fullName, email: user.email })
@@ -33,14 +38,33 @@ export default function Settings() {
       <div className="grid cols-2">
         <form className="card" onSubmit={async (e) => {
           e.preventDefault()
-          await api.put('/api/settings/organization', orgForm)
+          await api.put('/api/settings/organization', {
+            ...orgForm,
+            budgetAvailable: orgForm.budgetAvailable ? Number(orgForm.budgetAvailable) : 0
+          })
           qc.invalidateQueries({ queryKey: ['org'] })
+          qc.invalidateQueries({ queryKey: ['invest-rec'] })
+          qc.invalidateQueries({ queryKey: ['invest-proj'] })
+          setOrgSaved(true)
+          setTimeout(() => setOrgSaved(false), 3000)
         }}>
           <h3>Organization</h3>
           <div className="field"><label>Name</label><input disabled={!isAdmin} value={orgForm.name} onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })} /></div>
           <div className="field"><label>Logo URL</label><input disabled={!isAdmin} value={orgForm.logoUrl} onChange={(e) => setOrgForm({ ...orgForm, logoUrl: e.target.value })} /></div>
-          <p className="muted">Budget available {org.data?.budgetAvailable} · allocated {org.data?.budgetAllocated}</p>
-          <AdminOnly><button className="btn">Save org</button></AdminOnly>
+          <div className="field">
+            <label>Budget Available (₹)</label>
+            <input
+              disabled={!isAdmin}
+              type="number"
+              min="0"
+              step="50000"
+              value={orgForm.budgetAvailable}
+              onChange={(e) => setOrgForm({ ...orgForm, budgetAvailable: e.target.value })}
+            />
+          </div>
+          <p className="muted">Allocated to date: ₹{Number(org.data?.budgetAllocated || 0).toLocaleString('en-IN')}</p>
+          {orgSaved && <p style={{ color: '#10b981', fontSize: 13 }}>✓ Organization settings saved successfully!</p>}
+          <AdminOnly><button className="btn">Save organization</button></AdminOnly>
         </form>
         <form className="card" onSubmit={async (e) => {
           e.preventDefault()
